@@ -47,6 +47,8 @@ pip install -r requirements.txt
 ```
 python scraper/scraper.py
 ```
+## Result of data analysis
+![image](https://github.com/user-attachments/assets/f71c1266-a493-4b83-b4c8-093f139c3db5)
 
 ## Contributing
 If you want to contribute to the project, please follow these steps:
