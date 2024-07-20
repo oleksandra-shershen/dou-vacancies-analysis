@@ -5,7 +5,7 @@ This project requires a combination of Web Scraping & Data Analysis skills. The 
 technologies in the tech market right now. For example, to become a Python Developer, you need to know Django/Flask, Web, PostgreSQL.
 However, even these technologies may not be as popular at the moment you search for jobs.
 To be more prepared for interviews and to understand which technologies you should learn, this project creates statistics of the most 
-demanded technologies based on Djinni vacancies for Python Developers.
+demanded technologies based on DOU vacancies for Python Developers.
 
 ## Features
 - Scrape job listings from https://jobs.dou.ua/
