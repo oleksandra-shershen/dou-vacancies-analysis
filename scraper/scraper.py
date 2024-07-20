@@ -13,13 +13,6 @@ from bs4 import BeautifulSoup
 
 from config import TECHNOLOGIES
 
-VACANCIES_URLS = [
-    ("https://jobs.dou.ua/vacancies/?category=Python&exp=0-1", "0-1"),
-    ("https://jobs.dou.ua/vacancies/?category=Python&exp=1-3", "1-3"),
-    ("https://jobs.dou.ua/vacancies/?category=Python&exp=3-5", "3-5"),
-    ("https://jobs.dou.ua/vacancies/?category=Python&exp=5plus", "5+"),
-]
-
 
 def click_all_load_more_buttons(driver: webdriver.Chrome) -> None:
     while True:
