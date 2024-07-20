@@ -26,6 +26,7 @@ cd dou-vacancies-analysis
 ```
 
 2. Create and activate a virtual environment
+
 On Windows:
 ```
 python -m venv venv 
