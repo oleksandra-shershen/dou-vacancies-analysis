@@ -1,7 +1,6 @@
 import csv
 import os
 import asyncio
-import re
 from aiohttp import ClientSession
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -12,11 +11,17 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
-from config import TECHNOLOGIES, VACANCIES_URL
+from config import TECHNOLOGIES
+
+VACANCIES_URLS = [
+    ("https://jobs.dou.ua/vacancies/?category=Python&exp=0-1", "0-1"),
+    ("https://jobs.dou.ua/vacancies/?category=Python&exp=1-3", "1-3"),
+    ("https://jobs.dou.ua/vacancies/?category=Python&exp=3-5", "3-5"),
+    ("https://jobs.dou.ua/vacancies/?category=Python&exp=5plus", "5+"),
+]
 
 
 def click_all_load_more_buttons(driver: webdriver.Chrome) -> None:
-    page_number = 1
     while True:
         try:
             load_more_button = WebDriverWait(driver, 10).until(
@@ -27,7 +32,6 @@ def click_all_load_more_buttons(driver: webdriver.Chrome) -> None:
 
             load_more_button.click()
 
-            page_number += 1
         except Exception:
             break
 
@@ -51,15 +55,10 @@ async def fetch_detailed_description(session: ClientSession, job_url: str) -> di
 
         requirements = [tech for tech in TECHNOLOGIES if tech.lower() in job_description.lower()]
 
-        # Extract experience using regex
-        experience_match = re.search(r'(\d+\+ years)', job_description)
-        experience = experience_match.group(0) if experience_match else "Not specified"
-
         return {
             "description": job_description,
             "city": city,
             "requirements": ", ".join(requirements),
-            "experience": experience
         }
 
 
@@ -76,11 +75,10 @@ async def fetch_all_descriptions(job_listings: list) -> list:
             job["description"] = descriptions[i]["description"]
             job["city"] = descriptions[i]["city"]
             job["requirements"] = descriptions[i]["requirements"]
-            job["experience"] = descriptions[i]["experience"]
         return job_listings
 
 
-def parse_page(driver: webdriver.Chrome) -> list:
+def parse_page(driver: webdriver.Chrome, experience: str) -> list:
     soup = BeautifulSoup(driver.page_source, "html.parser")
     vacancy_cards = soup.find_all("li", class_="l-vacancy")
     job_listings = []
@@ -99,7 +97,7 @@ def parse_page(driver: webdriver.Chrome) -> list:
                     "description": "",
                     "city": "",
                     "requirements": "",
-                    "experience": ""
+                    "experience": experience
                 }
             )
     return job_listings
@@ -138,13 +136,17 @@ async def get_all_vacancies() -> None:
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()), options=chrome_options
     )
-    driver.get(VACANCIES_URL)
 
-    click_all_load_more_buttons(driver)
+    all_vacancies = []
 
-    job_listings = parse_page(driver)
-    detailed_job_listings = await fetch_all_descriptions(job_listings)
-    unique_detailed_job_listings = remove_duplicates_from_requirements(detailed_job_listings)
+    for url, experience in VACANCIES_URLS:
+        driver.get(url)
+        click_all_load_more_buttons(driver)
+        job_listings = parse_page(driver, experience)
+        detailed_job_listings = await fetch_all_descriptions(job_listings)
+        all_vacancies.extend(detailed_job_listings)
+
+    unique_detailed_job_listings = remove_duplicates_from_requirements(all_vacancies)
 
     write_to_csv(unique_detailed_job_listings, "data/vacancies.csv")
     driver.quit()
