@@ -12,12 +12,6 @@ demanded technologies based on DOU vacancies for Python Developers.
 - Analyze and visualize the most mentioned technologies
 - Breakdown job listings by location and experience level
 
-## Prerequisites
-- Python 3.8+
-- Scrapy
-- pandas
-- matplotlib
-
 ## Setup
 1. Clone the repository:
 ```
